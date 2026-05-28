@@ -27,15 +27,28 @@ public class BurstTower : MonoBehaviour
     public Button upgradeButton;
     public Button deleteButton;
     public Transform cameraRef;
+    public Button upgradeInvalidButton;
+    public GameManager gm;
     void Start()
     {
+        gm = GameManager.Instance;
         upgradeButton.onClick.AddListener(UpgradeListener);
         deleteButton.onClick.AddListener(DeleteListener);
     }
     void UpgradeListener()
     {
-        if(tier < 3)
+        if(tier == 1 && gm.purchasableItems[4])
         {
+            gm.banana = gm.banana - 3;
+            gm.coconut = gm.coconut - 4;
+            tier++;
+            fireRate = fireRate - fireRateDecrease;
+            //setup range changer
+            damage = damage + damageIncrease;
+        }
+        if(tier == 2 && gm.purchasableItems[5])
+        {
+            gm.coconut = gm.coconut - 7;
             tier++;
             fireRate = fireRate - fireRateDecrease;
             //setup range changer
@@ -118,6 +131,21 @@ public class BurstTower : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
+        if (gm.purchasableItems[4] && tier == 1)
+            {
+                upgradeButton.gameObject.SetActive(true);
+                upgradeInvalidButton.gameObject.SetActive(false);
+            }
+            else if (gm.purchasableItems[5] && tier == 2)
+            {
+                upgradeButton.gameObject.SetActive(true);
+                upgradeInvalidButton.gameObject.SetActive(false);
+            }
+            else
+            {
+                upgradeButton.gameObject.SetActive(false);
+                upgradeInvalidButton.gameObject.SetActive(true);
+            }
         if (other.CompareTag("Chimp"))
         {
             enemiesInRange.Add(other.transform);
@@ -126,6 +154,11 @@ public class BurstTower : MonoBehaviour
 
     void OnTriggerExit(Collider other)
     {
+        if (other.CompareTag("Player"))
+        {
+            upgradeButton.gameObject.SetActive(false);
+            upgradeInvalidButton.gameObject.SetActive(false);
+        }
         if (other.CompareTag("Chimp"))
         {
             enemiesInRange.Remove(other.transform);

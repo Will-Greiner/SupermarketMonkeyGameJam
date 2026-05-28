@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem.LowLevel;
 
@@ -22,25 +23,29 @@ public class ResortPlayer : MonoBehaviour
 
     void Update()
     {
-        float horizontal = Input.GetAxisRaw("Horizontal");
-        float vertical = Input.GetAxisRaw("Vertical");
+        if (!gameManager.playerCart)
+        {
+            float horizontal = Input.GetAxisRaw("Horizontal");
+            float vertical = Input.GetAxisRaw("Vertical");
 
-        Transform cam = Camera.main.transform;
+            Transform cam = Camera.main.transform;
 
-        Vector3 forward = cam.forward;
-        Vector3 right = cam.right;
+            Vector3 forward = cam.forward;
+            Vector3 right = cam.right;
 
-        forward.y = 0f;
-        right.y = 0f;
+            forward.y = 0f;
+            right.y = 0f;
 
-        forward.Normalize();
-        right.Normalize();
+            forward.Normalize();
+            right.Normalize();
 
-        moveDirection = (forward * vertical + right * horizontal).normalized;
+            moveDirection = (forward * vertical + right * horizontal).normalized;
+        }
     }
 
     void FixedUpdate()
     {
+        if(!gameManager.playerCart){
         // Movement
         Vector3 targetVelocity = moveDirection * moveSpeed;
 
@@ -65,15 +70,57 @@ public class ResortPlayer : MonoBehaviour
                 )
             );
         }
+        }
     }
 
     void OnTriggerEnter(Collider other) { 
-        if(other.gameObject.tag == "Empty Tower" && gameManager.gameState == "Building") { 
-            target = other.gameObject.transform; 
-            if(target.GetComponent<TowerMenu>().towerEmpty == true) { 
-                target.GetChild(0).gameObject.SetActive(true); 
-            } 
-        }
+        if(other.CompareTag("Empty Tower") &&
+   gameManager.gameState == "Building")
+{
+    gameManager.CheckCosts();
+
+    target = other.transform;
+
+    target.GetChild(0).gameObject.SetActive(true);
+
+    TowerMenu menu = target.GetComponent<TowerMenu>();
+
+    // Turn EVERYTHING off first
+    for(int i = 0; i < 6; i++)
+    {
+        menu.validTowerOptions[i].SetActive(false);
+    }
+
+    // Single tower
+    if(gameManager.purchasableItems[0])
+    {
+        menu.validTowerOptions[0].SetActive(true);
+    }
+    else
+    {
+        menu.validTowerOptions[1].SetActive(true);
+    }
+
+    // Spread tower
+    if(gameManager.purchasableItems[3])
+    {
+        menu.validTowerOptions[2].SetActive(true);
+    }
+    else
+    {
+        menu.validTowerOptions[3].SetActive(true);
+    }
+
+    // Slow tower
+    if(gameManager.purchasableItems[6])
+    {
+        menu.validTowerOptions[4].SetActive(true);
+    }
+    else
+    {
+        menu.validTowerOptions[5].SetActive(true);
+    }
+}
         if((other.gameObject.tag == "Tower"|| other.gameObject.tag == "Slow") && gameManager.gameState == "Building")
         {
             gameManager.CheckCosts();
@@ -83,10 +130,17 @@ public class ResortPlayer : MonoBehaviour
     }
 
     void OnTriggerExit(Collider other) { 
-        if(other.gameObject.tag == "Empty Tower") 
-        { 
-            other.transform.GetChild(0).gameObject.SetActive(false);
-        } 
+        if(other.CompareTag("Empty Tower"))
+{
+    TowerMenu menu = other.GetComponent<TowerMenu>();
+
+    for(int i = 0; i < 6; i++)
+    {
+        menu.validTowerOptions[i].SetActive(false);
+    }
+
+    other.transform.GetChild(0).gameObject.SetActive(false);
+}
         if(other.gameObject.tag == "Tower"|| other.gameObject.tag == "Slow")
         {
             other.transform.GetChild(0).gameObject.SetActive(false);

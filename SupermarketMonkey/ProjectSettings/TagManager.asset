@@ -10,6 +10,7 @@ TagManager:
   - Chimp
   - Base
   - Tower
+  - Shelf
   layers:
   - Default
   - TransparentFX

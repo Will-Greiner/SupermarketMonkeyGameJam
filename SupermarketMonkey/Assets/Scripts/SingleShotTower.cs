@@ -20,17 +20,31 @@ public class SingleShotTower : MonoBehaviour
     public float fireRateDecrease;
     public int tier = 1;
     public Button upgradeButton;
+    public Button upgradeInvalidButton;
     public Button deleteButton;
     public Transform cameraRef;
+    public GameManager gm;
     void Start()
     {
         upgradeButton.onClick.AddListener(UpgradeListener);
         deleteButton.onClick.AddListener(DeleteListener);
+        gm = GameManager.Instance;
     }
     void UpgradeListener()
     {
-        if(tier < 3)
+        if(tier == 1 && gm.purchasableItems[1])
         {
+            gm.pineapple--;
+            gm.soup = gm.soup -3;
+            tier++;
+            fireRate = fireRate - fireRateDecrease;
+            //setup range changer
+            damage = damage + damageIncrease;
+        }
+        if(tier == 2 && gm.purchasableItems[2])
+        {
+            gm.pineapple = gm.pineapple - 5;
+            gm.soup = gm.soup - 4;
             tier++;
             fireRate = fireRate - fireRateDecrease;
             //setup range changer
@@ -83,6 +97,24 @@ public class SingleShotTower : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
+        if (other.CompareTag("Player"))
+        {
+            if (gm.purchasableItems[1] && tier == 1)
+            {
+                upgradeButton.gameObject.SetActive(true);
+                upgradeInvalidButton.gameObject.SetActive(false);
+            }
+            else if (gm.purchasableItems[2] && tier == 2)
+            {
+                upgradeButton.gameObject.SetActive(true);
+                upgradeInvalidButton.gameObject.SetActive(false);
+            }
+            else
+            {
+                upgradeButton.gameObject.SetActive(false);
+                upgradeInvalidButton.gameObject.SetActive(true);
+            }
+        }
         if (other.CompareTag("Chimp"))
         {
             enemiesInRange.Add(other.transform);
@@ -91,6 +123,11 @@ public class SingleShotTower : MonoBehaviour
 
     void OnTriggerExit(Collider other)
     {
+        if (other.CompareTag("Player"))
+        {
+            upgradeButton.gameObject.SetActive(false);
+            upgradeInvalidButton.gameObject.SetActive(false);
+        }
         if (other.CompareTag("Chimp"))   // FIXED
         {
             enemiesInRange.Remove(other.transform);

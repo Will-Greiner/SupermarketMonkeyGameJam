@@ -16,12 +16,16 @@ public class ChimpSystem : MonoBehaviour
     public float rotationSpeed = 10f;
     private float fixedY;
 
+    private bool isDead = false;
     public Vector3 velocity;
     private Vector3 lastPosition;
+
+    public ChimpSpawner spawner;
 
     void Start()
     {
         currentHealth = maxHealth;
+        spawner = ChimpSpawner.Instance;
 
         fixedY = transform.position.y;
         baseSpeed = moveSpeed;
@@ -33,17 +37,15 @@ public class ChimpSystem : MonoBehaviour
 
     void Update()
     {
-        if (currentHealth <= 0)
-        {
-            Die();
-        }
+        if (currentHealth <= 0 && !isDead)
+{
+    Die();
+    return;
+}
         velocity = (transform.position - lastPosition) / Time.deltaTime;
         lastPosition = transform.position;
 
-        if (currentHealth <= 0)
-        {
-            Die();
-        }
+        
 
         Transform targetWaypoint = waypoints.transform.GetChild(target);
 
@@ -107,10 +109,19 @@ public class ChimpSystem : MonoBehaviour
     }
 
     void Die()
+{
+    if (isDead)
+        return;
+
+    isDead = true;
+
+    if (spawner != null)
     {
-        Destroy(gameObject);
+        spawner.OnChimpDeath();
     }
 
+    Destroy(gameObject);
+}
     void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Slow"))

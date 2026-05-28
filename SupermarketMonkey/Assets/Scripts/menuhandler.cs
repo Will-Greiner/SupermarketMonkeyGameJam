@@ -1,6 +1,7 @@
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class menuhandler : MonoBehaviour
 {
@@ -13,14 +14,26 @@ public class menuhandler : MonoBehaviour
     public Button costs;
     public Button startWave;
     public Button costsBack;
+    public Button goButton;
+    public Button continueButton;
+    public Button continueTDButton;
     public GameObject mainMenu;
     public GameObject creditsMenu;
     public GameObject towerBuildingMenu;
     public GameObject costsMenu;
     public GameObject towerGameplayMenu;
+    public GameObject shoppingResults;
+    public GameObject shoppingMenu;
+    public GameObject towerResultsMenu;
 
-    
-    
+    public CameraFollow cameraPosition;
+    public ShoppingCartController cart;
+    public Image timerPie;
+    public TMP_Text countdown;
+    public GameObject background;
+
+
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -30,6 +43,9 @@ public class menuhandler : MonoBehaviour
         costs.onClick.AddListener(CostsListener);
         startWave.onClick.AddListener(StartListener);
         costsBack.onClick.AddListener(CostsBackListener);
+        goButton.onClick.AddListener(GoListener);
+        continueButton.onClick.AddListener(ContinueListener);
+        continueTDButton.onClick.AddListener(ContinuetoStoreListener);
     }
 
     // Update is called once per frame
@@ -40,8 +56,10 @@ public class menuhandler : MonoBehaviour
     void PlayListener()
     {
         mainMenu.SetActive(false);
-        towerBuildingMenu.SetActive(true);
-        gm.gameState = "Building";
+        shoppingMenu.SetActive(true);
+        gm.gameState = "Shopping";
+        gm.playerCart = true;
+        cameraPosition.onCart = true;
     }
     void CreditsListener()
     {
@@ -72,5 +90,38 @@ public class menuhandler : MonoBehaviour
     {
         gm.gameState = "Menu";
         costsMenu.SetActive(false);
+    }
+    void GoListener()
+    { 
+        goButton.gameObject.SetActive(false);
+        gm.StartTimer();
+    }
+    void ContinueListener()
+    {
+        shoppingResults.SetActive(false);
+        cart.currentCart = 0;
+        cart.capacity.text = "0/" + cart.cartCapacity;
+        goButton.gameObject.SetActive(true);
+        continueButton.gameObject.SetActive(false);
+        gm.gameState = "Building";
+        gm.playerCart = false;
+        cameraPosition.onCart = false;
+        timerPie.gameObject.SetActive(true);
+        timerPie.fillAmount = 1;
+        countdown.text = "20";
+        countdown.gameObject.SetActive(true);
+        towerBuildingMenu.SetActive(true);
+        cart.ResetPosition();
+        shoppingMenu.SetActive(false);
+    }
+    void ContinuetoStoreListener()
+    {
+        towerResultsMenu.SetActive(false);
+        towerGameplayMenu.SetActive(false);
+        gm.gameState = "Shopping";
+        gm.playerCart = true;
+        cameraPosition.onCart = true;
+        shoppingMenu.SetActive(true);
+        cart.ResetPosition();
     }
 }

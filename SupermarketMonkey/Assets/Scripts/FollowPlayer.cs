@@ -2,7 +2,10 @@ using UnityEngine;
 
 public class CameraFollow : MonoBehaviour
 {
+    public bool onCart = true;
     public Rigidbody playerRb;
+    public Rigidbody playerNoCartRb;
+    public Rigidbody playerCartRb;
 
     public Vector3 offset = new Vector3(0f, 5f, -8f);
 
@@ -24,6 +27,7 @@ public class CameraFollow : MonoBehaviour
     private float currentDistance;
 
     private float targetfocallength;
+    public bool newPosition = true;
 
     void Start()
     {
@@ -36,6 +40,19 @@ public class CameraFollow : MonoBehaviour
         targetfocallength = cam.focalLength;
     }
 
+    void Update()
+    {
+        if (onCart)
+    {
+        playerRb = playerCartRb;
+        offset = new Vector3(-6.41f, 7.63f, 0f);
+    }
+    else
+    {
+        playerRb = playerNoCartRb;
+        offset = new Vector3(-6.41f, 7.63f, 0f);
+    }
+    }
     void LateUpdate()
     {
         HandleZoom();
