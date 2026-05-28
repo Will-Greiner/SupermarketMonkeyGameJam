@@ -4,6 +4,16 @@ using UnityEngine.UI;
 
 public class TowerMenu : MonoBehaviour
 {
+    [System.Serializable]
+    public class TowerCost
+    {
+        public int mango;
+        public int pineapple;
+    }
+    public TowerCost tower1Cost;
+    public TowerCost tower2Cost;
+    public TowerCost tower3Cost;
+
     public bool towerEmpty = true;
     public Button tower1;
     public Button tower2;
@@ -13,6 +23,7 @@ public class TowerMenu : MonoBehaviour
     public GameObject prefabTower1;
     public GameObject prefabTower2;
     public GameObject prefabTower3;
+    public Transform cameraRef;
     
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()

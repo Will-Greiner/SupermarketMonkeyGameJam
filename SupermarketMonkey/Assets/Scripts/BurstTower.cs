@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class BurstTower : MonoBehaviour
 {
@@ -17,6 +18,35 @@ public class BurstTower : MonoBehaviour
     [Header("Fire Rate")]
     public float fireRate = 1f;
     private float fireCooldown = 0f;
+
+    public GameObject emptySpace;
+    public float damageIncrease;
+    public float rangeIncrease;
+    public float fireRateDecrease;
+    public int tier = 1;
+    public Button upgradeButton;
+    public Button deleteButton;
+    public Transform cameraRef;
+    void Start()
+    {
+        upgradeButton.onClick.AddListener(UpgradeListener);
+        deleteButton.onClick.AddListener(DeleteListener);
+    }
+    void UpgradeListener()
+    {
+        if(tier < 3)
+        {
+            tier++;
+            fireRate = fireRate - fireRateDecrease;
+            //setup range changer
+            damage = damage + damageIncrease;
+        }
+    }
+    void DeleteListener()
+    {
+        Instantiate(emptySpace, transform.position, Quaternion.identity);
+        Destroy(gameObject);
+    }
 
     void Update()
     {

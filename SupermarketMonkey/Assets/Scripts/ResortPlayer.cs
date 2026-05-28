@@ -1,87 +1,95 @@
-using System;
 using UnityEngine;
-using TMPro;
-using System.Collections;
+using UnityEngine.InputSystem.LowLevel;
+
 public class ResortPlayer : MonoBehaviour
 {
-    private bool isAccelerating = false;
-    private bool canMove = true;
+    public GameManager gameManager;
+    public string gameState;
+    private Camera cam;
+    private Rigidbody rb;
 
-    private Rigidbody playerRigidbody;
-
-    public float playerAcceleration;
-    public float playerMaxVelocity;
-    public float rotationSpeed = 10f;
+    public float moveSpeed = 6f;
+    public float rotationSpeed = 12f;
 
     private Vector3 moveDirection;
-    public float raycastDistance = 3f;
-    public LayerMask raycastLayers;
-    private Transform target;
+    public Transform target;
 
     void Start()
     {
-        playerRigidbody = GetComponent<Rigidbody>();
+        
+        rb = GetComponent<Rigidbody>();
     }
 
     void Update()
     {
-        float horizontal = -Input.GetAxisRaw("Horizontal");
+        float horizontal = Input.GetAxisRaw("Horizontal");
         float vertical = Input.GetAxisRaw("Vertical");
 
-        // Create movement direction vector
-        moveDirection = new Vector3(vertical, 0f, horizontal);
+        Transform cam = Camera.main.transform;
 
-        // Check if player is moving
-        isAccelerating = moveDirection.magnitude > 0.1f;
+        Vector3 forward = cam.forward;
+        Vector3 right = cam.right;
 
-        // Rotate player toward movement direction
-        if (isAccelerating)
-        {
-            Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
-            transform.rotation = Quaternion.Slerp(
-                transform.rotation,
-                targetRotation,
-                rotationSpeed * Time.deltaTime
-            );
-        }
-        RaycastHit hit;
+        forward.y = 0f;
+        right.y = 0f;
 
-        if (Physics.Raycast(transform.position, transform.forward, out hit, raycastDistance, raycastLayers))
-        {
-            Debug.Log("Hit: " + hit.collider.name);
-        }
+        forward.Normalize();
+        right.Normalize();
 
-// Debug ray visualization
-        Debug.DrawRay(transform.position,transform.forward * raycastDistance,Color.red);
+        moveDirection = (forward * vertical + right * horizontal).normalized;
     }
 
     void FixedUpdate()
     {
-        if (isAccelerating && canMove)
-        {
-            // Apply movement force
-            playerRigidbody.AddForce(moveDirection * playerAcceleration,ForceMode.Force);
+        // Movement
+        Vector3 targetVelocity = moveDirection * moveSpeed;
 
-        // Clamp max speed
-            playerRigidbody.linearVelocity = Vector3.ClampMagnitude(playerRigidbody.linearVelocity,playerMaxVelocity);
+        rb.linearVelocity = new Vector3(
+            targetVelocity.x,
+            rb.linearVelocity.y,
+            targetVelocity.z
+        );
+
+
+
+        if (moveDirection.sqrMagnitude > 0.01f)
+        {
+            Quaternion targetRot =
+                Quaternion.LookRotation(moveDirection);
+
+            rb.MoveRotation(
+                Quaternion.Slerp(
+                    rb.rotation,
+                    targetRot,
+                    rotationSpeed * Time.fixedDeltaTime
+                )
+            );
         }
     }
-    void OnTriggerEnter(Collider other)
-    {
-        if(other.gameObject.tag == "Empty Tower")
+
+    void OnTriggerEnter(Collider other) { 
+        if(other.gameObject.tag == "Empty Tower" && gameManager.gameState == "Building") { 
+            target = other.gameObject.transform; 
+            if(target.GetComponent<TowerMenu>().towerEmpty == true) { 
+                target.GetChild(0).gameObject.SetActive(true); 
+            } 
+        }
+        if((other.gameObject.tag == "Tower"|| other.gameObject.tag == "Slow") && gameManager.gameState == "Building")
         {
+            gameManager.CheckCosts();
             target = other.gameObject.transform;
-            if(target.GetComponent<TowerMenu>().towerEmpty == true)
-            {
-                target.GetChild(0).gameObject.SetActive(true);
-            }
+            target.GetChild(0).gameObject.SetActive(true);
         }
     }
-    void OnTriggerExit(Collider other)
-    {
-        if(other.gameObject.tag == "Empty Tower")
+
+    void OnTriggerExit(Collider other) { 
+        if(other.gameObject.tag == "Empty Tower") 
+        { 
+            other.transform.GetChild(0).gameObject.SetActive(false);
+        } 
+        if(other.gameObject.tag == "Tower"|| other.gameObject.tag == "Slow")
         {
-            target.GetChild(0).gameObject.SetActive(false);
+            other.transform.GetChild(0).gameObject.SetActive(false);
         }
     }
 }

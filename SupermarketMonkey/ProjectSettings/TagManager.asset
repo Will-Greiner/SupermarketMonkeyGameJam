@@ -9,6 +9,7 @@ TagManager:
   - Slow
   - Chimp
   - Base
+  - Tower
   layers:
   - Default
   - TransparentFX
