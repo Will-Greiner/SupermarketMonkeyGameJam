@@ -45,12 +45,12 @@ public class CameraFollow : MonoBehaviour
         if (onCart)
     {
         playerRb = playerCartRb;
-        offset = new Vector3(-6.41f, 7.63f, 0f);
+        //offset = new Vector3(-6.41f, 7.63f, 0f);
     }
     else
     {
         playerRb = playerNoCartRb;
-        offset = new Vector3(-6.41f, 7.63f, 0f);
+        //offset = new Vector3(-6.41f, 7.63f, 0f);
     }
     }
     void LateUpdate()

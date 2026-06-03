@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using TMPro;
 
 [System.Serializable]
 public class waveInfo
@@ -10,6 +11,9 @@ public class waveInfo
 
 public class ChimpSpawner : MonoBehaviour
 {
+    public TMP_Text currentWave;
+    public TMP_Text enemiesRemaining;
+    public GameManager gm;
     private bool waveStarted = false;
     public static ChimpSpawner Instance;
     public GameObject endTowerScreen;
@@ -26,12 +30,18 @@ public class ChimpSpawner : MonoBehaviour
 
     public bool spawnChimps = false;
     private bool isSpawning = false;
+    public GameObject endgame;
+    public GameObject wongame;
 
     void Awake()
     {
         Instance = this;
     }
-
+    
+    void Start()
+    {
+        gm = GameManager.Instance;
+    }
     void Update()
 {
     if (spawnChimps && !isSpawning)
@@ -45,6 +55,15 @@ public class ChimpSpawner : MonoBehaviour
     {
         endTowerScreen.SetActive(true);
         wave++;
+        if(wave == 7)
+            {
+                WonGame();
+            }
+            else
+            {
+                
+            }
+        gm.day++;
         waveStarted = false; // reset for next wave
     }
 }
@@ -90,11 +109,19 @@ public class ChimpSpawner : MonoBehaviour
 
         currentlySpawnedChimps++;
         totalSpawnedChimps++;
+        enemiesRemaining.text = currentlySpawnedChimps.ToString();
+        currentWave.text = (wave + 1).ToString();
     }
 
     // Call this from chimp when it dies
     public void OnChimpDeath()
     {
         currentlySpawnedChimps--;
+        enemiesRemaining.text = currentlySpawnedChimps.ToString();
+    }
+    void WonGame()
+    {
+        endgame.SetActive(true);
+        wongame.SetActive(true);
     }
 }

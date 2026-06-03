@@ -14,6 +14,10 @@ public class SlowTower : MonoBehaviour
     public Button upgradeInvalidButton;
     public Transform cameraRef;
     public GameManager gm;
+
+    public GameObject tier1;
+    public GameObject tier2;
+    public GameObject tier3;
     void Start()
     {
         gm = GameManager.Instance;
@@ -25,13 +29,19 @@ public class SlowTower : MonoBehaviour
     {
         if(tier == 1 && gm.purchasableItems[7])
         {
+            tier1.SetActive(false);
+            tier2.SetActive(true);
+            
             gm.mango = gm.mango - 5;
             tier++;
             //setup range changer
             slowrate = slowrate-slowIncrease;
         }
-        if(tier == 2 && gm.purchasableItems[8])
+        else if(tier == 2 && gm.purchasableItems[8])
         {
+            tier2.SetActive(false);
+            tier3.SetActive(true);
+            
             gm.watermelon = gm.watermelon - 4;
             tier++;
             //setup range changer

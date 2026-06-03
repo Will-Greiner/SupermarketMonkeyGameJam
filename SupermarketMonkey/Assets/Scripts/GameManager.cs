@@ -8,7 +8,7 @@ using NUnit.Framework.Interfaces;
 
 public class GameManager : MonoBehaviour
 {
-    public float roundTime = 20f;
+    public float roundTime = 4f;
     private float timer;
     private bool isRunning;
 
@@ -160,6 +160,6 @@ public class GameManager : MonoBehaviour
         timerPie.gameObject.SetActive(false);
         countdown.gameObject.SetActive(false);
         continueButton.gameObject.SetActive(true);
-        roundTime = 20f;
+        roundTime = 4f;
     }
 }

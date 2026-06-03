@@ -5,6 +5,10 @@ using UnityEngine.UI;
 
 public class SingleShotTower : MonoBehaviour
 {
+    
+    public GameObject tier1;
+    public GameObject tier2;
+    public GameObject tier3;
     public List<Transform> enemiesInRange = new List<Transform>();
     public Transform currentTarget;
 
@@ -24,16 +28,24 @@ public class SingleShotTower : MonoBehaviour
     public Button deleteButton;
     public Transform cameraRef;
     public GameManager gm;
+    public ResortPlayer player;
+    public GameObject[] pivotPoints;
+    public GameObject[] pivotPointsBase;
     void Start()
     {
         upgradeButton.onClick.AddListener(UpgradeListener);
         deleteButton.onClick.AddListener(DeleteListener);
-        gm = GameManager.Instance;
+        gm = GameManager.Instance;  
+        player = ResortPlayer.Instance;
     }
     void UpgradeListener()
     {
         if(tier == 1 && gm.purchasableItems[1])
         {
+            player.interactionAnimation();
+            tier1.SetActive(false);
+            tier2.SetActive(true);
+            
             gm.pineapple--;
             gm.soup = gm.soup -3;
             tier++;
@@ -41,8 +53,11 @@ public class SingleShotTower : MonoBehaviour
             //setup range changer
             damage = damage + damageIncrease;
         }
-        if(tier == 2 && gm.purchasableItems[2])
+        else if(tier == 2 && gm.purchasableItems[2])
         {
+            tier2.SetActive(false);
+            tier3.SetActive(true);
+            
             gm.pineapple = gm.pineapple - 5;
             gm.soup = gm.soup - 4;
             tier++;
@@ -68,6 +83,10 @@ public class SingleShotTower : MonoBehaviour
         {
             Shoot();
             fireCooldown = 1f / fireRate;
+        }
+        if(currentTarget != null)
+        {
+            pivotPoints[tier-1].transform.LookAt(currentTarget);  
         }
     }
 
@@ -137,9 +156,8 @@ public class SingleShotTower : MonoBehaviour
     void Shoot()
     {
         if (currentTarget == null) return;
-
+        
         GameObject proj = Instantiate(projectilePrefab, firePoint.position, Quaternion.identity);
-
         Projectile p = proj.GetComponent<Projectile>();
         if (p != null)
         {

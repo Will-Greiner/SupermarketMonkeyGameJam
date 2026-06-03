@@ -14,11 +14,17 @@ public class ResortPlayer : MonoBehaviour
 
     private Vector3 moveDirection;
     public Transform target;
+    public Animator anim;
 
+    public static ResortPlayer Instance;
     void Start()
     {
-        
         rb = GetComponent<Rigidbody>();
+    }
+
+    void Awake()
+    {
+        Instance = this;
     }
 
     void Update()
@@ -145,5 +151,10 @@ public class ResortPlayer : MonoBehaviour
         {
             other.transform.GetChild(0).gameObject.SetActive(false);
         }
+    }
+
+    public void interactionAnimation()
+    {
+        anim.SetTrigger("Interact");
     }
 }

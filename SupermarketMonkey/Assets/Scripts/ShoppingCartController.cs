@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System.Diagnostics;
 
 [RequireComponent(typeof(Rigidbody))]
 public class ShoppingCartController : MonoBehaviour
@@ -30,11 +31,11 @@ public class ShoppingCartController : MonoBehaviour
     public bool canMove = false;
     public TMP_Text capacity;
     public GameObject spawnPoint;
-    public Vector3 origin;
+    public GameObject cartSpawn;
 
     void Start()
     {
-        origin = new Vector3(-19.3f, 0f, -4.82f);
+        
     }
     void Awake()
     {
@@ -51,7 +52,9 @@ public class ShoppingCartController : MonoBehaviour
         {
             if(cartContents[currentShelfIndex] < 5)
             {
-                Instantiate(spawnGroceries[currentShelfIndex], spawnPoint.transform.position, Quaternion.identity);
+                GameObject newObject = Instantiate(spawnGroceries[currentShelfIndex], spawnPoint.transform.position, Quaternion.identity);
+                newObject.transform.parent = gameObject.transform;
+                Destroy(newObject, 20f);
                 cartContents[currentShelfIndex]++;
                 currentCart++;
             }
@@ -96,47 +99,48 @@ public class ShoppingCartController : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        onShelf = true;
-        char check = other.GetComponent<ShelfLogic>().product;
+        if (other.CompareTag("Shelf"))
+        {
+            onShelf = true;
+        int check = other.GetComponent<ShelfLogic>().product;
         switch (check)
         {
-            case 'm':
+            case 0:
                 currentShelfIndex = 0;
                 break;
-            case 'p':
+            case 1:
                 currentShelfIndex = 1;
                 break;
-            case 'b':
+            case 2:
                 currentShelfIndex = 2;
                 break;
-            case 'c':
+            case 3:
                 currentShelfIndex = 3;
                 break;
-            case 's':
+            case 4:
                 currentShelfIndex = 4;
                 break;
-            case 'w':
+            case 5:
                 currentShelfIndex = 5;
                 break;
 
+        }
         }
     }
 
     void updateCapacity()
     {
-        capacity.text = currentCart.ToString() + "/" + cartCapacity.ToString(); 
+        capacity.text = currentCart.ToString(); 
     }
     
     public void ResetPosition()
         {
-    // Stop physics
-    rb.linearVelocity = Vector3.zero;
-    rb.angularVelocity = Vector3.zero;
-
+            UnityEngine.Debug.Log("Help");
     // Move to spawn point
-        transform.position = origin;
+        transform.position = cartSpawn.transform.position;
         transform.rotation = Quaternion.Euler(0, 90, 0);
     
+        
 
     // Reset gameplay state
         currentCart = 0;

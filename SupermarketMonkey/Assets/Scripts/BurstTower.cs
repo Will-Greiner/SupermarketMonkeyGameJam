@@ -29,6 +29,13 @@ public class BurstTower : MonoBehaviour
     public Transform cameraRef;
     public Button upgradeInvalidButton;
     public GameManager gm;
+    public GameObject[] pivotPoints;
+
+
+
+    public GameObject tier1;
+    public GameObject tier2;
+    public GameObject tier3;
     void Start()
     {
         gm = GameManager.Instance;
@@ -39,6 +46,9 @@ public class BurstTower : MonoBehaviour
     {
         if(tier == 1 && gm.purchasableItems[4])
         {
+            tier1.SetActive(false);
+            tier2.SetActive(true);
+            
             gm.banana = gm.banana - 3;
             gm.coconut = gm.coconut - 4;
             tier++;
@@ -46,8 +56,11 @@ public class BurstTower : MonoBehaviour
             //setup range changer
             damage = damage + damageIncrease;
         }
-        if(tier == 2 && gm.purchasableItems[5])
+        else if(tier == 2 && gm.purchasableItems[5])
         {
+            tier2.SetActive(false);
+            tier3.SetActive(true);
+            
             gm.coconut = gm.coconut - 7;
             tier++;
             fireRate = fireRate - fireRateDecrease;
@@ -63,6 +76,7 @@ public class BurstTower : MonoBehaviour
 
     void Update()
     {
+        
         CleanNullTargets();
         SelectTarget();
 
@@ -72,6 +86,10 @@ public class BurstTower : MonoBehaviour
         {
             ShootBurst();
             fireCooldown = 1f / fireRate;
+        }
+        if(currentTarget != null)
+        {
+            pivotPoints[tier-1].transform.LookAt(currentTarget);
         }
     }
 

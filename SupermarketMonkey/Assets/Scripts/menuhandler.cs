@@ -2,9 +2,11 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class menuhandler : MonoBehaviour
 {
+        
     public GameManager gm;
     public string gameState;
     public GameObject spawner;
@@ -17,6 +19,7 @@ public class menuhandler : MonoBehaviour
     public Button goButton;
     public Button continueButton;
     public Button continueTDButton;
+    public Button restartButton;
     public GameObject mainMenu;
     public GameObject creditsMenu;
     public GameObject towerBuildingMenu;
@@ -31,7 +34,7 @@ public class menuhandler : MonoBehaviour
     public Image timerPie;
     public TMP_Text countdown;
     public GameObject background;
-
+    public TMP_Text waves;
 
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -46,6 +49,7 @@ public class menuhandler : MonoBehaviour
         goButton.onClick.AddListener(GoListener);
         continueButton.onClick.AddListener(ContinueListener);
         continueTDButton.onClick.AddListener(ContinuetoStoreListener);
+        restartButton.onClick.AddListener(RestartListener);
     }
 
     // Update is called once per frame
@@ -98,11 +102,11 @@ public class menuhandler : MonoBehaviour
     }
     void ContinueListener()
     {
+        waves.text = gm.day.ToString();
         shoppingResults.SetActive(false);
         cart.currentCart = 0;
         cart.capacity.text = "0/" + cart.cartCapacity;
         goButton.gameObject.SetActive(true);
-        continueButton.gameObject.SetActive(false);
         gm.gameState = "Building";
         gm.playerCart = false;
         cameraPosition.onCart = false;
@@ -123,5 +127,11 @@ public class menuhandler : MonoBehaviour
         cameraPosition.onCart = true;
         shoppingMenu.SetActive(true);
         cart.ResetPosition();
+    }
+
+    void RestartListener()
+    {
+        Scene activeScene = SceneManager.GetActiveScene();
+        SceneManager.LoadScene(activeScene.name);
     }
 }
